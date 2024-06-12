@@ -1,0 +1,546 @@
+{
+  "name": "Swap Nodes [Algo]",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Medium",
+    "Data Structures",
+    "problem-solving",
+    "Core CS"
+  ]
+}
+{
+  "name": "Kitty's Calculations on a Tree",
+  "difficulty_name": "Advanced",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Memoization and Dynamic Programming",
+    "Hard",
+    "Core CS"
+  ]
+}
+{
+  "name": "Is This a Binary Search Tree?",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Core CS"
+  ]
+}
+{
+  "name": "Square-Ten Tree",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "ad-hoc",
+    "big integers",
+    "Core CS"
+  ]
+}
+{
+  "name": "Balanced Forest",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Hard",
+    "problem-solving",
+    "Core CS"
+  ]
+}
+{
+  "name": "Jenny's Subtrees",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Core CS"
+  ]
+}
+{
+  "name": "Tree Coordinates",
+  "difficulty_name": "Expert",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Expert",
+    "Core CS"
+  ]
+}
+{
+  "name": "Array Pairs",
+  "difficulty_name": "Advanced",
+  "tag_names": [
+    "RangeQuery"
+  ]
+}
+{
+  "name": "Self Balancing Tree",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "avl",
+    "binary search tree",
+    "Core CS",
+    "Balanced Trees"
+  ]
+}
+{
+  "name": "Array and simple queries",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Balanced Trees"
+  ]
+}
+{
+  "name": "Median Updates",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Search",
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Balanced Trees"
+  ]
+}
+{
+  "name": "Merging Communities ",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Disjoint Set",
+    "Core CS"
+  ]
+}
+{
+  "name": "QHEAP1",
+  "difficulty_name": "Easy",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Min Heap",
+    "Heaps",
+    "Core CS",
+    "Heap"
+  ]
+}
+{
+  "name": "Maximum Element",
+  "difficulty_name": "Easy",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "stack",
+    "Stacks",
+    "Core CS"
+  ]
+}
+{
+  "name": "Queue using Two Stacks",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Queues",
+    "Core CS"
+  ]
+}
+{
+  "name": "Components in a graph",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Disjoint Set",
+    "Core CS"
+  ]
+}
+{
+  "name": "Balanced Brackets",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Medium",
+    "Data Structures",
+    "stack",
+    "Stacks",
+    "problem-solving",
+    "Core CS"
+  ]
+}
+{
+  "name": "Castle on the Grid",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Medium",
+    "Data Structures",
+    "#queue",
+    "Queues",
+    "problem-solving",
+    "Core CS"
+  ]
+}
+{
+  "name": "Jesse and Cookies",
+  "difficulty_name": "Easy",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Heap"
+  ]
+}
+{
+  "name": "Kundu and Tree",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Disjoint Set",
+    "Core CS"
+  ]
+}
+{
+  "name": "Find the Running Median",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Heap"
+  ]
+}
+{
+  "name": "Down to Zero II",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Queues",
+    "Core CS"
+  ]
+}
+{
+  "name": "Equal Stacks",
+  "difficulty_name": "Easy",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Greedy Algorithms",
+    "Stacks",
+    "Core CS"
+  ]
+}
+{
+  "name": "Minimum Average Waiting Time",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Heap"
+  ]
+}
+{
+  "name": "Truck Tour",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Queues",
+    "Core CS"
+  ]
+}
+{
+  "name": "Game of Two Stacks",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Medium",
+    "Data Structures",
+    "Stacks",
+    "Core CS"
+  ]
+}
+{
+  "name": "Largest Rectangle ",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Medium",
+    "Data Structures",
+    "Stacks",
+    "problem-solving",
+    "Core CS"
+  ]
+}
+{
+  "name": "Queries with Fixed Length",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "#queue",
+    "Queues",
+    "Core CS"
+  ]
+}
+{
+  "name": "Super Maximum Cost Queries",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Sorting",
+    "Algorithms",
+    "Binary Search",
+    "data structure",
+    "Disjoint Set",
+    "Hard",
+    "Core CS"
+  ]
+}
+{
+  "name": "Simple Text Editor",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "stack",
+    "Stacks",
+    "Core CS"
+  ]
+}
+{
+  "name": "Poisonous Plants",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "stack",
+    "Hard",
+    "Stacks",
+    "problem-solving",
+    "Core CS"
+  ]
+}
+{
+  "name": "AND xor OR",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Stacks",
+    "Core CS"
+  ]
+}
+{
+  "name": "Waiter",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "stack",
+    "Stacks",
+    "Core CS"
+  ]
+}
+{
+  "name": "Contacts",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Tries",
+    "trie",
+    "Core CS"
+  ]
+}
+{
+  "name": "No Prefix Set",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Medium",
+    "Data Structures",
+    "DataStructures",
+    "trie",
+    "Core CS"
+  ]
+}
+{
+  "name": " Data Structures MCQ 1",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS"
+  ]
+}
+{
+  "name": " Data Structures MCQ 2",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS"
+  ]
+}
+{
+  "name": " Data Structures MCQ 3",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS"
+  ]
+}
+{
+  "name": "Kindergarten Adventures",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Segment Tree",
+    "Algorithms",
+    "Medium",
+    "data structure",
+    "Core CS"
+  ]
+}
+{
+  "name": "Cube Summation",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Mr. X and His Shots",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Direct Connections",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Graph Theory",
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Subsequence Weighting",
+  "difficulty_name": "Advanced",
+  "tag_names": [
+    "Math",
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Jim and the Skyscrapers",
+  "difficulty_name": "Medium",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Palindromic Subsets",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Segment Tree",
+    "Algorithms",
+    "Data Structures",
+    "Combinatorics",
+    "Hard",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Counting On a Tree",
+  "difficulty_name": "Expert",
+  "tag_names": [
+    "Segment Tree",
+    "Tree",
+    "Algorithms",
+    "Expert",
+    "Core CS",
+    "HLD"
+  ]
+}
+{
+  "name": "Polynomial Division",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Algorithms",
+    "Data Structures",
+    "Hard",
+    "Polynomials",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
+{
+  "name": "Costly Intervals",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Trees",
+    "Data Structures",
+    "Hard",
+    "Core CS"
+  ]
+}
+{
+  "name": "The Strange Function",
+  "difficulty_name": "Hard",
+  "tag_names": [
+    "Trees",
+    "Segment Tree",
+    "Data Structures",
+    "Hard",
+    "Core CS"
+  ]
+}
+{
+  "name": "Self-Driving Bus",
+  "difficulty_name": "Advanced",
+  "tag_names": [
+    "Trees",
+    "Algorithms",
+    "Data Structures",
+    "Core CS",
+    "Advanced Data Structures"
+  ]
+}
