@@ -8,20 +8,19 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import joblib
+import statistics
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
 
 # Connect to MongoDB
-# client = pymongo.MongoClient("mongodb://localhost:27017/")
-# db = client["problem_solving_db"]
-# users_collection = db["users"]
-# problems_collection = db["problems"]
-
 connector = con()
 
 # Fetch user data
-users_data = connector.load_data("userData")
-problems_data = connector.load_data("hackrank1")
+users_data = connector.get_user_data()
+problems_data = connector.get_problem_data()
+
+# users_data = connector.load_data("userData")
+# problems_data = connector.load_data("hackrank1")
 
 print(f"Users data: {users_data}")
 print(f"Problems data: {problems_data}")
@@ -33,15 +32,34 @@ problems_df = pd.DataFrame(problems_data)
 # Feature Engineering
 
 
+def calculate_avg_difficulty(df):
+    difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
+    df["difficulty_score"] = df["difficulty"].map(difficulty_values)
+    return df["difficulty_score"].mean()
+
+
+def predict_performance_trend(df):
+    if df.empty:
+        return "Insufficient data"
+
+    average_time = df["time_taken_minutes"].mean()
+    if average_time < 15:
+        return "Improving very quickly"
+    elif average_time < 30:
+        return "Improving steadily"
+    else:
+        return "Improving slowly"
+
+
 def extract_features(user):
 
     # print(f"User: {user}")
     solved_problems = user['solved_problems']
-    average_difficulty = user['average_difficulty_level']
     preferred_tags = user['preferred_tags']
     learning_path = user['learning_path']
-    performance_trends = user['performance_trends']
-    learning_style = user['learning_style']
+    # average_difficulty = user['average_difficulty_level']
+    # performance_trends = user['performance_trends']
+    # learning_style = user['learning_style']
 
     # Convert categorical to numerical
     label_encoder = LabelEncoder()
@@ -56,7 +74,6 @@ def extract_features(user):
     tags_encoded = ohe.fit_transform([preferred_tags]).toarray()[0]
 
     # Aggregate other features if needed
-
     features = [
         user['average_difficulty_level'],
         user['performance_trends'],
