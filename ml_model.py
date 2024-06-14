@@ -1,14 +1,14 @@
 # /mnt/data/ml_model.py
 
-import pymongo
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, GridSearchCV
+# from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import joblib
-import statistics
+from datetime import datetime, timedelta
+# import statistics
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
 
@@ -19,11 +19,8 @@ connector = con()
 users_data = connector.get_user_data()
 problems_data = connector.get_problem_data()
 
-# users_data = connector.load_data("userData")
-# problems_data = connector.load_data("hackrank1")
-
-print(f"Users data: {users_data}")
-print(f"Problems data: {problems_data}")
+# print(f"Users data: {users_data}")
+# print(f"Problems data: {problems_data}")
 
 # Data Preprocessing
 users_df = pd.DataFrame(users_data)
@@ -51,12 +48,101 @@ def predict_performance_trend(df):
         return "Improving slowly"
 
 
+def assess_learning_style(df_problems):
+    if df_problems.empty or len(df_problems) == 0:
+        return "Insufficient data"
+
+    # Define difficulty levels and initialize counts
+    difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
+
+    # Calculate the start date for the time period (e.g., last week)
+    today = datetime.today()
+    last_week = today - timedelta(days=7)
+
+    # Filter solved problems within the last week
+    recent_problems = df_problems[df_problems["solved_at"] >= last_week]
+
+    if recent_problems.empty or len(recent_problems) == 0:
+        return "Insufficient data"
+
+    # Count occurrences of each difficulty level in the recent problems
+    for difficulty_level in difficulty_counts:
+        difficulty_counts[difficulty_level] = (
+            recent_problems["difficulty"] == difficulty_level).sum()
+
+    # Determine learning style based on counts
+    max_difficulty = max(difficulty_counts.values())
+    learning_style = [
+        key for key, value in difficulty_counts.items() if value == max_difficulty]
+
+    if len(learning_style) == 1:
+        return f"Prefers {learning_style[0]} problems"
+    else:
+        return "Balanced approach"
+
+
+# def assess_learning_style(df_problems):
+#     if df_problems.empty:
+#         return "Insufficient data"
+#
+#     # Define difficulty levels
+#     difficulty_levels = {"easy", "medium", "hard"}
+#
+#     # Calculate the start date for the time period (e.g., last week)
+#     today = datetime.today()
+#     last_week = today - timedelta(days=7)
+#
+#     # Filter solved problems within the last week
+#     recent_problems = df_problems[df_problems["solved_at"] >= last_week]
+#
+#     if recent_problems.empty:
+#         return "Insufficient data"
+#
+#     # Count occurrences of each difficulty level in the recent problems
+#     difficulty_counts = {level: (
+#         recent_problems["difficulty"] == level).sum() for level in difficulty_levels}
+#
+#     # Determine learning style based on counts
+#     if difficulty_counts["hard"] > difficulty_counts["medium"] and difficulty_counts["hard"] > difficulty_counts["easy"]:
+#         return "Prefers challenging problems"
+#     elif difficulty_counts["medium"] > difficulty_counts["hard"] and difficulty_counts["medium"] > difficulty_counts["easy"]:
+#         return "Balanced approach"
+#     elif difficulty_counts["easy"] > difficulty_counts["medium"] and difficulty_counts["easy"] > difficulty_counts["hard"]:
+#         return "Prefers easy problems"
+#     else:
+#         return "Balanced approach"
+
+
+def convert_to_dataframe(user_data):
+
+    # print(user_data)
+
+    # print(type(solved_problems[0][0]))  # Here's your dict
+    solved_problems = user_data["solved_problems"][0]
+    for problem in solved_problems:
+        # sanitize time_taken
+
+        print(type(problem))
+        time_taken = problem["time_taken"]
+        problem["time_taken"] = int(time_taken.split()[0])
+
+        # sanitize solved_at
+        solved_at = problem["solved_at"]
+        problem["solved_at"] = pd.to_datetime(solved_at)
+
+    return solved_problems
+
+
 def extract_features(user):
 
-    # print(f"User: {user}")
-    solved_problems = user['solved_problems']
-    preferred_tags = user['preferred_tags']
-    learning_path = user['learning_path']
+    # print(f"User: {user['solved_problems']}")
+    # Convert solved problems to a DataFrame
+    df_problems = convert_to_dataframe(user)
+    average_difficulty = calculate_avg_difficulty(df_problems)
+    performance_trends = predict_performance_trend(df_problems)
+    learning_style = assess_learning_style(df_problems)
+    print(df_problems)
+    # preferred_tags = user['preferred_tags']
     # average_difficulty = user['average_difficulty_level']
     # performance_trends = user['performance_trends']
     # learning_style = user['learning_style']
