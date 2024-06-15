@@ -14,11 +14,26 @@ class MongoDBConnector:
         self.client = pymongo.MongoClient(self.connection_string)
         self.default_collection = default_collection
 
-    def load_data(self, collection_name=None):
-        if collection_name is None:
-            collection_name = self.default_collection
+    # def load_data(self, collection_name=None):
+    #     if collection_name is None:
+    #         collection_name = self.default_collection
+    #     db = self.client["problemdb"]
+    #     collection = db[collection_name]
+    #     cursor = collection.find()
+    #     df = pd.DataFrame(list(cursor))
+    #     return df
+
+    def get_user_data(self):
         db = self.client["problemdb"]
-        collection = db[collection_name]
+        # collection = db["userData"]
+        collection = db["userSolvedProb"]
+        cursor = collection.find({"solved_problems": {"$exists": True}})
+        df = pd.DataFrame(list(cursor))
+        return df
+
+    def get_problem_data(self):
+        db = self.client["problemdb"]
+        collection = db["hackrank1"]
         cursor = collection.find()
         df = pd.DataFrame(list(cursor))
         return df
@@ -28,4 +43,5 @@ class MongoDBConnector:
 if __name__ == "__main__":
     connector = MongoDBConnector()
     df = connector.load_data()
+    # print column names
     print(df)
