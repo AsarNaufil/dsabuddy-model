@@ -13,7 +13,7 @@ from connector import MongoDBConnector as con
 
 connector = con()
 
-# TODO: fetch me daddy
+
 user_id = "u123456"
 users_data = connector.get_training_user_data(user_id)
 problems_data = connector.get_problem_data()
@@ -336,37 +336,48 @@ def problem(user):
     #
     # result = result[0] if result else None
 
-    print(f"Suggested problem: ")
+    print("Suggested problem: ")
     for key, value in result.items():
         print(f"{key}: {value}")
     return result
-
-
-problem(users_data)
 
 
 # Create Flask API
 app = Flask(__name__)
 
 
-@ app.route('/suggest_problem', methods=['POST'])
-def suggest_problem_endpoint():
-    user_data = request.json
-    user_features = extract_features(user_data)
-    suggested_problem = suggest_problem(user_features, problems_df)
+@app.route('/suggest', methods=['GET'])
+def suggest_next_problem():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return jsonify({"error": "user_id is required"})
+
+    user_data = connector.get_training_user_data(user_id)
+    # problems_data = connector.get_problem_data()
+
+    users_df = pd.DataFrame(user_data)
+
+    next_difficulty = suggest_next_difficulty(users_df)
+    next_tags = suggest_next_tags(users_df)
+
+    query = {
+        "difficulty": next_difficulty,
+        "tags": {"$in": next_tags}
+    }
+
+    result = list(connector.search_problems(query))[0]
 
     response = {
-        "average_difficulty_level": suggested_problem['difficulty_name'],
-        "performance_trends": suggested_problem['difficulty_name'],
-        "learning_style": suggested_problem['difficulty_name'],
+        "next_difficulty": next_difficulty,
+        "next_tags": next_tags,
         "suggested_problem": {
-            "name": suggested_problem['name'],
-            "link": suggested_problem['link'],
-            "tags": suggested_problem['tag_names']
+            "name": result['name'],
+            "link": result['link'],
+            "tags": result['tag_names']
         }
     }
     return jsonify(response)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, port=5000)

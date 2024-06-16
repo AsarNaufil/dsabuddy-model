@@ -16,7 +16,6 @@ class MongoDBConnector:
 
     def get_user_data(self):
         db = self.client["problemdb"]
-        # collection = db["userData"]
         collection = db["userSolvedProb"]
         cursor = collection.find({"solved_problems": {"$exists": True}})
         df = pd.DataFrame(list(cursor))
