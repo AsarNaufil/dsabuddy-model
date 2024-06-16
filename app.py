@@ -72,10 +72,17 @@ def convert_to_dataframe(user_data):
 
     # print(user_data["solved_problems"][0][0])
     # print(type(solved_problems[0][0]))  # Here's your dict
-    solved_problems = user_data["solved_problems"][0]
 
-    if not solved_problems:
+    if user_data is None or len(user_data) == 0:
         return pd.DataFrame()
+
+    # print(user_data)
+    # print(type(user_data))
+
+    # if not user_data["solved_problems"] or len(user_data["solved_problems"]) == 0:
+    # return pd.DataFrame()
+
+    solved_problems = user_data["solved_problems"][0]
 
     for problem in solved_problems:
         # sanitize time_taken
