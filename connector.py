@@ -9,8 +9,7 @@ class MongoDBConnector:
         load_dotenv()
         self.mongo_username = os.getenv("MONGODB_ATLAS_USERNAME")
         self.mongo_password = os.getenv("MONGODB_ATLAS_PASSWORD")
-        self.connection_string = f"mongodb+srv://{self.mongo_username}:{
-            self.mongo_password}@clusterhack.gwtbxxu.mongodb.net/"
+        self.connection_string = f"mongodb+srv://{self.mongo_username}:{self.mongo_password}@clusterhack.gwtbxxu.mongodb.net/"
         self.client = pymongo.MongoClient(self.connection_string)
         self.default_collection = default_collection
 
