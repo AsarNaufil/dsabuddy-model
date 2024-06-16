@@ -8,6 +8,7 @@ import joblib
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
+import json as JSON
 
 # Fetch user data
 
@@ -158,7 +159,7 @@ def suggest_next_tags(df):
     if df.empty:
         return ["array", "hash table", "string"]
 
-    print(df.head())
+    print(df.columns)
 
     tags_data = df.explode('tags')
 
@@ -361,16 +362,7 @@ def suggest_next_problem():
     problems_data = connector.get_problem_data()
 
     users_df = pd.DataFrame(users_data)
-    # problems_df = pd.DataFrame(problems_data)
-
-    # user_data = connector.get_training_user_data(user_id)
-    # problems_data = connector.get_problem_data()
-
-    # users_df = pd.DataFrame(user_data)
-
     users_df = convert_to_dataframe(users_df)
-    # if solved_problems.empty:
-    #     return jsonify({"error": "Insufficient data"})
 
     next_difficulty = suggest_next_difficulty(users_df)
     next_tags = suggest_next_tags(users_df)
@@ -381,18 +373,26 @@ def suggest_next_problem():
     }
 
     result = list(connector.search_problems(query))[0]
+    print(type(result))
+    print((result))
 
-    response = {
-        "next_difficulty": next_difficulty,
-        "next_tags": next_tags,
-        "suggested_problem": {
-            "name": result['name'],
-            "link": result['link'],
-            "tags": result['tag_names']
-        }
-    }
-    return jsonify(response)
+    result['_id'] = str(result['_id'])
+
+    # result = JSON.dumps(result)
+    print(type(result))
+
+    # response = {
+    #     "next_difficulty": next_difficulty,
+    #     "next_tags": next_tags,
+    # "suggested_problem": {
+    #     "name": result['name'],
+    #     "link": result['link'],
+    #     "tags": result['tag_names']
+    # }
+    #     "suggested_problem": result
+    # }
+    return jsonify(result)
 
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000)
+    app.run(debug=True, port=8080)
