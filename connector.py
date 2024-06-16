@@ -14,15 +14,6 @@ class MongoDBConnector:
         self.client = pymongo.MongoClient(self.connection_string)
         self.default_collection = default_collection
 
-    # def load_data(self, collection_name=None):
-    #     if collection_name is None:
-    #         collection_name = self.default_collection
-    #     db = self.client["problemdb"]
-    #     collection = db[collection_name]
-    #     cursor = collection.find()
-    #     df = pd.DataFrame(list(cursor))
-    #     return df
-
     def get_user_data(self):
         db = self.client["problemdb"]
         # collection = db["userData"]
@@ -38,15 +29,11 @@ class MongoDBConnector:
     #     df = pd.DataFrame(list(cursor))
     #     return df
 
-    def get_training_user_data(self):
+    def get_training_user_data(self, user_id):
         db = self.client["problemdb"]
         collection = db["userSolvedProb"]
-        cursor = collection.find({"user_id": "u123456"})
-
-        # print((list(cursor)[0]))
-
+        cursor = collection.find({"user_id": user_id})
         df = pd.DataFrame(list(cursor))
-
         return df
 
     def get_problem_data(self):
@@ -56,15 +43,21 @@ class MongoDBConnector:
         df = pd.DataFrame(list(cursor))
         return df
 
-    # TODO: suggest problems based on user data
-    def send_suggested_problem(self, criteria):
+    def search_problems(self, criteria):
         db = self.client["problemdb"]
-        collection = db["striver"]
+        collection = db["leetcode"]
         cursor = collection.find(criteria)
+        return cursor
         # convert cursor to json
 
         # convert pd.datetime to ISODate JSON
-        problem["solved_at"] = pd.to_datetime(solved_at).to_pydatetime()
+        # problem["solved_at"] = pd.to_datetime(solved_at).to_pydatetime()
+
+    def search_aggregate(self, pipeline):
+        db = self.client["problemdb"]
+        collection = db["striver"]
+        cursor = collection.aggregate(pipeline)
+        return cursor
 
 
 # Example usage:

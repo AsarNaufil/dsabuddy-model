@@ -9,12 +9,13 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
 
-
 # Fetch user data
 
 connector = con()
-users_data = connector.get_training_user_data()
-# problems_data = connector.get_problem_data()
+
+# TODO: fetch me daddy
+user_id = "u123456"
+users_data = connector.get_training_user_data(user_id)
 problems_data = connector.get_problem_data()
 
 # print(f"Users data: {users_data["solved_problems"][0][0].keys()}")
@@ -25,6 +26,12 @@ users_df = pd.DataFrame(users_data)
 problems_df = pd.DataFrame(problems_data)
 
 # Feature Engineering
+
+TOPICS = ["array", "hash table", "string", "math", "stack", "linked list",
+          "union find", "bit manipulation", "combinatorics", "divide and conquer",
+          "merge sort", "segment tree", "binary indexed tree", "ordered set",
+          "matrix", "binary search", "recursion", "sorting", "two pointers",
+          "sliding window", "dynamic programming"]
 
 
 def calculate_mode_difficulty(df):
@@ -45,58 +52,6 @@ def predict_performance_trend(df):
         return "Improving steadily"
     else:
         return "Improving slowly"
-
-
-# def assess_learning_style(df_problems):
-#     if df_problems.empty or len(df_problems) == 0:
-#         return "Insufficient data"
-#
-#     # Define difficulty levels and initialize counts
-#     difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
-#     tag_preferences = {"easy": {}, "medium": {}, "hard": {}}
-#
-#     # Calculate the start date for the time period (e.g., last week)
-#     today = datetime.today()
-#     last_week = today - timedelta(days=7)
-#
-#     # Filter solved problems within the last week
-#     recent_problems = df_problems[df_problems["solved_at"] >= last_week]
-#
-#     if recent_problems.empty or len(recent_problems) == 0:
-#         return "Insufficient data"
-#
-#     # Count occurrences of each difficulty level and tags in recent problems
-#     for index, row in recent_problems.iterrows():
-#         difficulty_level = row["difficulty"]
-#         tags = row["tags"]
-#
-#         difficulty_counts[difficulty_level] += 1
-#
-#         for tag in tags:
-#             if tag not in tag_preferences[difficulty_level]:
-#                 tag_preferences[difficulty_level][tag] = 0
-#             tag_preferences[difficulty_level][tag] += 1
-#
-#     # Determine learning style based on counts and tag preferences
-#     max_difficulty = max(difficulty_counts.values())
-#     learning_style = [
-#         key for key, value in difficulty_counts.items() if value == max_difficulty]
-#
-#     if len(learning_style) == 1:
-#         preferred_difficulty = learning_style[0]
-#         preferred_tags = tag_preferences[preferred_difficulty]
-#
-#         # Find the most preferred tag within the preferred difficulty level
-#         most_preferred_tag = max(preferred_tags, key=preferred_tags.get)
-#
-#         return f"Prefers {preferred_difficulty} problems, especially {most_preferred_tag}"
-#     else:
-#         return "Balanced approach"
-
-# Example usage:
-# Assuming df_problems is already defined from user data
-# learning_style_result = assess_learning_style(df_problems)
-# print(learning_style_result)
 
 
 def assess_learning_style(df_problems):
@@ -130,6 +85,10 @@ def convert_to_dataframe(user_data):
     # print(user_data["solved_problems"][0][0])
     # print(type(solved_problems[0][0]))  # Here's your dict
     solved_problems = user_data["solved_problems"][0]
+
+    if not solved_problems:
+        return pd.DataFrame()
+
     for problem in solved_problems:
         # sanitize time_taken
         time_taken = problem["time_taken"]
@@ -145,7 +104,11 @@ def convert_to_dataframe(user_data):
     return pd.DataFrame(solved_problems)
 
 
-def suggest_next_difficulty(df, df_problems):
+def suggest_next_difficulty(df):
+
+    if df.empty or len(df) < 10:
+        return "easy"
+
     difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
     reverse_difficulty_values = {1: "easy", 2: "medium", 3: "hard"}
 
@@ -177,7 +140,7 @@ def suggest_next_difficulty(df, df_problems):
         pass
 
     # Assess learning style to further refine the suggestion
-    learning_style_result = assess_learning_style(df_problems)
+    learning_style_result = assess_learning_style(df)
     if "Prefers medium problems" in learning_style_result:
         next_difficulty_score = 2
     elif "Prefers hard problems" in learning_style_result:
@@ -190,35 +153,11 @@ def suggest_next_difficulty(df, df_problems):
     return next_difficulty
 
 
-# def suggest_next_difficulty(df):
-#     difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
-#     reverse_difficulty_values = {1: "easy", 2: "medium", 3: "hard"}
-#
-#     # Map the difficulties to numerical scores
-#     df["difficulty_score"] = df["difficulty"].map(difficulty_values)
-#
-#     # Calculate the mode of the difficulty scores
-#     mode_difficulty_score = df["difficulty_score"].mode().iloc[0]
-#
-#     # Calculate average performance metrics
-#     avg_attempts = df["attempts"].mean()
-#     avg_hints_used = df["hints_used"].mean()
-#     avg_time_taken = df["time_taken"].mean()
-#
-#     # Heuristic to suggest next difficulty
-#     if avg_attempts <= 2 and avg_hints_used <= 1 and avg_time_taken <= 30:
-#         # Suggest a higher difficulty
-#         next_difficulty_score = min(mode_difficulty_score + 1, 3)
-#     else:
-#         # Suggest the same difficulty
-#         next_difficulty_score = mode_difficulty_score
-#
-#     next_difficulty = reverse_difficulty_values[next_difficulty_score]
-
-    return next_difficulty
-
-
 def suggest_next_tags(df):
+
+    if df.empty:
+        return ["array", "hash table", "string"]
+
     tags_data = df.explode('tags')
 
     # Calculate performance metrics per tag
@@ -366,11 +305,51 @@ def suggest_problem(user_features, problems_df):
     return suggested_problem
 
 
+def problem(user):
+
+    df_problems = convert_to_dataframe(user)
+    # average_difficulty = calculate_mode_difficulty(df_problems)
+    # performance_trends = predict_performance_trend(df_problems)
+    # learning_style = assess_learning_style(df_problems)
+    # preferred_tags = df_problems["tags"].mode().values[0]
+
+    next_difficulty = suggest_next_difficulty(df_problems)
+    next_tags = suggest_next_tags(df_problems)
+
+    print(f"Next difficulty: {next_difficulty}")
+    print(f"Next tags: {next_tags}")
+
+    query = {
+        "difficulty": next_difficulty,
+        "tags": {"$in": next_tags}
+    }
+
+    result = list(connector.search_problems(query))[0]
+
+    # "$meta": "textScore",
+    # result = result.sort([
+    #     ("tag_names", {
+    #         "$in": next_tags
+    #     }),
+    #     ("tag_names", {"$size": -1})
+    # ]).limit(1)
+    #
+    # result = result[0] if result else None
+
+    print(f"Suggested problem: ")
+    for key, value in result.items():
+        print(f"{key}: {value}")
+    return result
+
+
+problem(users_data)
+
+
 # Create Flask API
 app = Flask(__name__)
 
 
-@app.route('/suggest_problem', methods=['POST'])
+@ app.route('/suggest_problem', methods=['POST'])
 def suggest_problem_endpoint():
     user_data = request.json
     user_features = extract_features(user_data)
