@@ -1,5 +1,3 @@
-# /mnt/data/ml_model.py
-
 import pandas as pd
 import numpy as np
 # from sklearn.model_selection import train_test_split, GridSearchCV
@@ -12,14 +10,15 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
 
-# Connect to MongoDB
-connector = con()
 
 # Fetch user data
-users_data = connector.get_user_data()
+
+connector = con()
+users_data = connector.get_training_user_data()
+# problems_data = connector.get_problem_data()
 problems_data = connector.get_problem_data()
 
-# print(f"Users data: {users_data}")
+# print(f"Users data: {users_data["solved_problems"][0][0].keys()}")
 # print(f"Problems data: {problems_data}")
 
 # Data Preprocessing
@@ -29,10 +28,22 @@ problems_df = pd.DataFrame(problems_data)
 # Feature Engineering
 
 
+# TODO: Change me to mode
 def calculate_avg_difficulty(df):
-    difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
-    df["difficulty_score"] = df["difficulty"].map(difficulty_values)
-    return df["difficulty_score"].mean()
+
+    # print(df.columns)
+
+    for problem in df:
+        difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
+        problem["difficulty_score"] = difficulty_values[problem["difficulty"]]
+        # print(problem["difficulty_score"])
+
+    print((df))
+    # print(type(df["difficulty_score"]))
+    # print(df["difficulty_score"])
+    print(df["difficulty_score"].mean())
+
+    # return df["difficulty_score"].mean()
 
 
 def predict_performance_trend(df):
@@ -115,14 +126,12 @@ def assess_learning_style(df_problems):
 
 def convert_to_dataframe(user_data):
 
-    # print(user_data)
+    # print(user_data["solved_problems"][0][0])
 
     # print(type(solved_problems[0][0]))  # Here's your dict
     solved_problems = user_data["solved_problems"][0]
     for problem in solved_problems:
         # sanitize time_taken
-
-        print(type(problem))
         time_taken = problem["time_taken"]
         problem["time_taken"] = int(time_taken.split()[0])
 
@@ -130,18 +139,18 @@ def convert_to_dataframe(user_data):
         solved_at = problem["solved_at"]
         problem["solved_at"] = pd.to_datetime(solved_at)
 
-    return solved_problems
+    return pd.DataFrame(solved_problems)
 
 
 def extract_features(user):
 
-    # print(f"User: {user['solved_problems']}")
+    # print(f"User: {user['solved_problems'][0][0]}")
     # Convert solved problems to a DataFrame
     df_problems = convert_to_dataframe(user)
     average_difficulty = calculate_avg_difficulty(df_problems)
     performance_trends = predict_performance_trend(df_problems)
     learning_style = assess_learning_style(df_problems)
-    print(df_problems)
+    # print(df_problems)
     # preferred_tags = user['preferred_tags']
     # average_difficulty = user['average_difficulty_level']
     # performance_trends = user['performance_trends']
