@@ -11,19 +11,19 @@ from connector import MongoDBConnector as con
 
 # Fetch user data
 
-connector = con()
+# connector = con()
 
 
-user_id = "u123456"
-users_data = connector.get_training_user_data(user_id)
-problems_data = connector.get_problem_data()
+# user_id = "u123456"
+# users_data = connector.get_training_user_data(user_id)
+# problems_data = connector.get_problem_data()
 
 # print(f"Users data: {users_data["solved_problems"][0][0].keys()}")
 # print(f"Problems data: {problems_data}")
 
 # Data Preprocessing
-users_df = pd.DataFrame(users_data)
-problems_df = pd.DataFrame(problems_data)
+# users_df = pd.DataFrame(users_data)
+# problems_df = pd.DataFrame(problems_data)
 
 # Feature Engineering
 
@@ -157,6 +157,8 @@ def suggest_next_tags(df):
 
     if df.empty:
         return ["array", "hash table", "string"]
+
+    print(df.head())
 
     tags_data = df.explode('tags')
 
@@ -348,14 +350,27 @@ app = Flask(__name__)
 
 @app.route('/suggest', methods=['GET'])
 def suggest_next_problem():
+
+    connector = con()
+
     user_id = request.args.get('user_id')
     if user_id is None:
         return jsonify({"error": "user_id is required"})
 
-    user_data = connector.get_training_user_data(user_id)
+    users_data = connector.get_training_user_data(user_id)
+    problems_data = connector.get_problem_data()
+
+    users_df = pd.DataFrame(users_data)
+    # problems_df = pd.DataFrame(problems_data)
+
+    # user_data = connector.get_training_user_data(user_id)
     # problems_data = connector.get_problem_data()
 
-    users_df = pd.DataFrame(user_data)
+    # users_df = pd.DataFrame(user_data)
+
+    users_df = convert_to_dataframe(users_df)
+    # if solved_problems.empty:
+    #     return jsonify({"error": "Insufficient data"})
 
     next_difficulty = suggest_next_difficulty(users_df)
     next_tags = suggest_next_tags(users_df)
