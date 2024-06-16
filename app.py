@@ -357,7 +357,7 @@ def suggest_next_problem():
 
     users_data = connector.get_training_user_data(user_id)
     # print(users_data)
-    problems_data = connector.get_problem_data()
+    # problems_data = connector.get_problem_data()
 
     users_df = pd.DataFrame(users_data)
     users_df = convert_to_dataframe(users_df)
