@@ -1,12 +1,11 @@
 import pandas as pd
 import numpy as np
-# from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import joblib
 from datetime import datetime, timedelta
-# import statistics
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
 
@@ -141,6 +140,7 @@ def convert_to_dataframe(user_data):
         problem["solved_at"] = pd.to_datetime(solved_at)
 
         # reverse the to_datetime to ISOdate format
+        # problem["solved_at"] = pd.to_datetime(solved_at).to_pydatetime()
 
     return pd.DataFrame(solved_problems)
 
@@ -252,34 +252,20 @@ def suggest_next_tags(df):
 
     return preferred_tags
 
-# Example usage with user's solved problems data
-# df_problems = convert_to_dataframe(user_data)
-# next_tags = suggest_next_tags(df_problems)
-# print(f"Suggested tags for the next problem: {next_tags}")
-
-
-# Example usage:
-# client = MongoClient('mongodb://localhost:27017/')
-# fetcher = ProblemDataFetcher(client)
-# df = fetcher.get_training_problem_data()
-# next_difficulty = suggest_next_difficulty(df)
-# print(f"Suggested next difficulty: {next_difficulty}")
-
 
 def extract_features(user):
 
     # print(f"User: {user['solved_problems'][0][0]}")
-    # Convert solved problems to a DataFrame
     df_problems = convert_to_dataframe(user)
     average_difficulty = calculate_mode_difficulty(df_problems)
     performance_trends = predict_performance_trend(df_problems)
     learning_style = assess_learning_style(df_problems)
     preferred_tags = df_problems["tags"].mode().values[0]
 
-    print(f"Average difficulty: {average_difficulty}")
-    print(f"Performance trends: {performance_trends}")
-    print(f"Learning style: {learning_style}")
-    print(f"Preferred tags: {preferred_tags}")
+    # print(f"Average difficulty: {average_difficulty}")
+    # print(f"Performance trends: {performance_trends}")
+    # print(f"Learning style: {learning_style}")
+    # print(f"Preferred tags: {preferred_tags}")
 
     # Convert categorical to numerical
     label_encoder = LabelEncoder()
@@ -305,21 +291,6 @@ def extract_features(user):
 
 # Extract features and labels
 # X = np.array([extract_features(user) for user in users_data])
-X = np.array(extract_features(users_data))
-y_avg_diff = np.array([user['average_difficulty_level']
-                      for user in users_data])
-y_perf_trends = np.array([user['performance_trends'] for user in users_data])
-y_learning_style = np.array([user['learning_style'] for user in users_data])
-
-# Split the data
-X_train, X_test, y_train_avg_diff, y_test_avg_diff = train_test_split(
-    X, y_avg_diff, test_size=0.2, random_state=42)
-_, _, y_train_perf_trends, y_test_perf_trends = train_test_split(
-    X, y_perf_trends, test_size=0.2, random_state=42)
-_, _, y_train_learning_style, y_test_learning_style = train_test_split(
-    X, y_learning_style, test_size=0.2, random_state=42)
-
-# Train models
 
 
 def train_model(X_train, y_train):
@@ -328,28 +299,41 @@ def train_model(X_train, y_train):
     return model
 
 
-model_avg_diff = train_model(X_train, y_train_avg_diff)
-model_perf_trends = train_model(X_train, y_train_perf_trends)
-model_learning_style = train_model(X_train, y_train_learning_style)
-
-# Evaluate models
-
-
 def evaluate_model(model, X_test, y_test):
     predictions = model.predict(X_test)
     print(classification_report(y_test, predictions))
 
 
-evaluate_model(model_avg_diff, X_test, y_test_avg_diff)
-evaluate_model(model_perf_trends, X_test, y_test_perf_trends)
-evaluate_model(model_learning_style, X_test, y_test_learning_style)
+def train_and_evaluate_models(X, y_avg_diff, y_perf_trends, y_learning_style):
 
-# Save models
-joblib.dump(model_avg_diff, 'model_avg_diff.pkl')
-joblib.dump(model_perf_trends, 'model_perf_trends.pkl')
-joblib.dump(model_learning_style, 'model_learning_style.pkl')
+    X = np.array(extract_features(users_data))
+    y_avg_diff = np.array([user['average_difficulty_level']
+                          for user in users_data])
+    y_perf_trends = np.array([user['performance_trends']
+                             for user in users_data])
+    y_learning_style = np.array([user['learning_style']
+                                for user in users_data])
 
-# Suggest a problem based on model predictions
+    # Split the data
+    X_train, X_test, y_train_avg_diff, y_test_avg_diff = train_test_split(
+        X, y_avg_diff, test_size=0.2, random_state=42)
+    _, _, y_train_perf_trends, y_test_perf_trends = train_test_split(
+        X, y_perf_trends, test_size=0.2, random_state=42)
+    _, _, y_train_learning_style, y_test_learning_style = train_test_split(
+        X, y_learning_style, test_size=0.2, random_state=42)
+
+    model_avg_diff = train_model(X_train, y_train_avg_diff)
+    model_perf_trends = train_model(X_train, y_train_perf_trends)
+    model_learning_style = train_model(X_train, y_train_learning_style)
+
+    evaluate_model(model_avg_diff, X_test, y_test_avg_diff)
+    evaluate_model(model_perf_trends, X_test, y_test_perf_trends)
+    evaluate_model(model_learning_style, X_test, y_test_learning_style)
+
+    # Save models
+    joblib.dump(model_avg_diff, 'model_avg_diff.pkl')
+    joblib.dump(model_perf_trends, 'model_perf_trends.pkl')
+    joblib.dump(model_learning_style, 'model_learning_style.pkl')
 
 
 def suggest_problem(user_features, problems_df):
