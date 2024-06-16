@@ -48,45 +48,13 @@ def predict_performance_trend(df):
         return "Improving slowly"
 
 
-def assess_learning_style(df_problems):
-    if df_problems.empty or len(df_problems) == 0:
-        return "Insufficient data"
-
-    # Define difficulty levels and initialize counts
-    difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
-
-    # Calculate the start date for the time period (e.g., last week)
-    today = datetime.today()
-    last_week = today - timedelta(days=7)
-
-    # Filter solved problems within the last week
-    recent_problems = df_problems[df_problems["solved_at"] >= last_week]
-
-    if recent_problems.empty or len(recent_problems) == 0:
-        return "Insufficient data"
-
-    # Count occurrences of each difficulty level in the recent problems
-    for difficulty_level in difficulty_counts:
-        difficulty_counts[difficulty_level] = (
-            recent_problems["difficulty"] == difficulty_level).sum()
-
-    # Determine learning style based on counts
-    max_difficulty = max(difficulty_counts.values())
-    learning_style = [
-        key for key, value in difficulty_counts.items() if value == max_difficulty]
-
-    if len(learning_style) == 1:
-        return f"Prefers {learning_style[0]} problems"
-    else:
-        return "Balanced approach"
-
-
 # def assess_learning_style(df_problems):
-#     if df_problems.empty:
+#     if df_problems.empty or len(df_problems) == 0:
 #         return "Insufficient data"
 #
-#     # Define difficulty levels
-#     difficulty_levels = {"easy", "medium", "hard"}
+#     # Define difficulty levels and initialize counts
+#     difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
+#     tag_preferences = {"easy": {}, "medium": {}, "hard": {}}
 #
 #     # Calculate the start date for the time period (e.g., last week)
 #     today = datetime.today()
@@ -95,28 +63,72 @@ def assess_learning_style(df_problems):
 #     # Filter solved problems within the last week
 #     recent_problems = df_problems[df_problems["solved_at"] >= last_week]
 #
-#     if recent_problems.empty:
+#     if recent_problems.empty or len(recent_problems) == 0:
 #         return "Insufficient data"
 #
-#     # Count occurrences of each difficulty level in the recent problems
-#     difficulty_counts = {level: (
-#         recent_problems["difficulty"] == level).sum() for level in difficulty_levels}
+#     # Count occurrences of each difficulty level and tags in recent problems
+#     for index, row in recent_problems.iterrows():
+#         difficulty_level = row["difficulty"]
+#         tags = row["tags"]
 #
-#     # Determine learning style based on counts
-#     if difficulty_counts["hard"] > difficulty_counts["medium"] and difficulty_counts["hard"] > difficulty_counts["easy"]:
-#         return "Prefers challenging problems"
-#     elif difficulty_counts["medium"] > difficulty_counts["hard"] and difficulty_counts["medium"] > difficulty_counts["easy"]:
-#         return "Balanced approach"
-#     elif difficulty_counts["easy"] > difficulty_counts["medium"] and difficulty_counts["easy"] > difficulty_counts["hard"]:
-#         return "Prefers easy problems"
+#         difficulty_counts[difficulty_level] += 1
+#
+#         for tag in tags:
+#             if tag not in tag_preferences[difficulty_level]:
+#                 tag_preferences[difficulty_level][tag] = 0
+#             tag_preferences[difficulty_level][tag] += 1
+#
+#     # Determine learning style based on counts and tag preferences
+#     max_difficulty = max(difficulty_counts.values())
+#     learning_style = [
+#         key for key, value in difficulty_counts.items() if value == max_difficulty]
+#
+#     if len(learning_style) == 1:
+#         preferred_difficulty = learning_style[0]
+#         preferred_tags = tag_preferences[preferred_difficulty]
+#
+#         # Find the most preferred tag within the preferred difficulty level
+#         most_preferred_tag = max(preferred_tags, key=preferred_tags.get)
+#
+#         return f"Prefers {preferred_difficulty} problems, especially {most_preferred_tag}"
 #     else:
 #         return "Balanced approach"
+
+# Example usage:
+# Assuming df_problems is already defined from user data
+# learning_style_result = assess_learning_style(df_problems)
+# print(learning_style_result)
+
+
+def assess_learning_style(df_problems):
+    if df_problems.empty or len(df_problems) == 0:
+        return "Insufficient data"
+    # Define difficulty levels and initialize counts
+    difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
+    # Calculate the start date for the time period (e.g., last week)
+    today = datetime.today()
+    last_week = today - timedelta(days=7)
+    # Filter solved problems within the last week
+    recent_problems = df_problems[df_problems["solved_at"] >= last_week]
+    if recent_problems.empty or len(recent_problems) == 0:
+        return "Insufficient data"
+    # Count occurrences of each difficulty level in the recent problems
+    for difficulty_level in difficulty_counts:
+        difficulty_counts[difficulty_level] = (
+            recent_problems["difficulty"] == difficulty_level).sum()
+    # Determine learning style based on counts
+    max_difficulty = max(difficulty_counts.values())
+    learning_style = [
+        key for key, value in difficulty_counts.items() if value == max_difficulty]
+    if len(learning_style) == 1:
+        return f"Prefers {learning_style[0]} problems"
+    else:
+        return "Balanced approach"
 
 
 def convert_to_dataframe(user_data):
 
     # print(user_data["solved_problems"][0][0])
-
     # print(type(solved_problems[0][0]))  # Here's your dict
     solved_problems = user_data["solved_problems"][0]
     for problem in solved_problems:
@@ -128,7 +140,130 @@ def convert_to_dataframe(user_data):
         solved_at = problem["solved_at"]
         problem["solved_at"] = pd.to_datetime(solved_at)
 
+        # reverse the to_datetime to ISOdate format
+
     return pd.DataFrame(solved_problems)
+
+
+def suggest_next_difficulty(df, df_problems):
+    difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
+    reverse_difficulty_values = {1: "easy", 2: "medium", 3: "hard"}
+
+    df["difficulty_score"] = df["difficulty"].map(difficulty_values)
+    mode_difficulty_score = df["difficulty_score"].mode().iloc[0]
+
+    # Calculate average performance metrics
+    avg_attempts = df["attempts"].mean()
+    avg_hints_used = df["hints_used"].mean()
+    avg_time_taken = df["time_taken"].mean()
+
+    # Heuristic to suggest next difficulty based on current performance
+    if avg_attempts <= 2 and avg_hints_used <= 1 and avg_time_taken <= 30:
+        next_difficulty_score = min(mode_difficulty_score + 1, 3)
+    else:
+        next_difficulty_score = mode_difficulty_score
+
+    performance_trend = predict_performance_trend(df)
+
+    # Adjust next_difficulty_score based on performance trend
+    if performance_trend == "Improving very quickly":
+        next_difficulty_score = min(next_difficulty_score + 2, 3)
+    elif performance_trend == "Improving steadily":
+        next_difficulty_score = min(next_difficulty_score + 1, 3)
+    elif performance_trend == "Improving slowly":
+        pass  # Maintain the calculated next_difficulty_score
+    else:
+        # Default to maintaining the current difficulty if performance trend is not clear
+        pass
+
+    # Assess learning style to further refine the suggestion
+    learning_style_result = assess_learning_style(df_problems)
+    if "Prefers medium problems" in learning_style_result:
+        next_difficulty_score = 2
+    elif "Prefers hard problems" in learning_style_result:
+        next_difficulty_score = 3
+    elif "Balanced approach" in learning_style_result:
+        pass  # Maintain the calculated next_difficulty_score
+
+    next_difficulty = reverse_difficulty_values[next_difficulty_score]
+
+    return next_difficulty
+
+
+# def suggest_next_difficulty(df):
+#     difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
+#     reverse_difficulty_values = {1: "easy", 2: "medium", 3: "hard"}
+#
+#     # Map the difficulties to numerical scores
+#     df["difficulty_score"] = df["difficulty"].map(difficulty_values)
+#
+#     # Calculate the mode of the difficulty scores
+#     mode_difficulty_score = df["difficulty_score"].mode().iloc[0]
+#
+#     # Calculate average performance metrics
+#     avg_attempts = df["attempts"].mean()
+#     avg_hints_used = df["hints_used"].mean()
+#     avg_time_taken = df["time_taken"].mean()
+#
+#     # Heuristic to suggest next difficulty
+#     if avg_attempts <= 2 and avg_hints_used <= 1 and avg_time_taken <= 30:
+#         # Suggest a higher difficulty
+#         next_difficulty_score = min(mode_difficulty_score + 1, 3)
+#     else:
+#         # Suggest the same difficulty
+#         next_difficulty_score = mode_difficulty_score
+#
+#     next_difficulty = reverse_difficulty_values[next_difficulty_score]
+
+    return next_difficulty
+
+
+def suggest_next_tags(df):
+    tags_data = df.explode('tags')
+
+    # Calculate performance metrics per tag
+    tag_performance = tags_data.groupby('tags').agg({
+        'attempts': 'mean',
+        'hints_used': 'mean',
+        'time_taken': 'mean',
+        'submission_status': lambda x: (x == 'accepted').mean()  # Success rate
+    }).reset_index()
+
+    # Define thresholds for good performance
+    thresholds = {
+        'attempts': 2,
+        'hints_used': 1,
+        'time_taken': 30,
+        'success_rate': 0.75  # At least 75% success rate
+    }
+
+    # Filter tags with good performance
+    preferred_tags = tag_performance[
+        (tag_performance['attempts'] <= thresholds['attempts']) &
+        (tag_performance['hints_used'] <= thresholds['hints_used']) &
+        (tag_performance['time_taken'] <= thresholds['time_taken']) &
+        (tag_performance['submission_status'] >= thresholds['success_rate'])
+    ]['tags'].tolist()
+
+    # If no tags meet the criteria, fall back to most frequent tags
+    if not preferred_tags:
+        preferred_tags = tags_data['tags'].value_counts().head(
+            3).index.tolist()
+
+    return preferred_tags
+
+# Example usage with user's solved problems data
+# df_problems = convert_to_dataframe(user_data)
+# next_tags = suggest_next_tags(df_problems)
+# print(f"Suggested tags for the next problem: {next_tags}")
+
+
+# Example usage:
+# client = MongoClient('mongodb://localhost:27017/')
+# fetcher = ProblemDataFetcher(client)
+# df = fetcher.get_training_problem_data()
+# next_difficulty = suggest_next_difficulty(df)
+# print(f"Suggested next difficulty: {next_difficulty}")
 
 
 def extract_features(user):
@@ -139,12 +274,12 @@ def extract_features(user):
     average_difficulty = calculate_mode_difficulty(df_problems)
     performance_trends = predict_performance_trend(df_problems)
     learning_style = assess_learning_style(df_problems)
+    preferred_tags = df_problems["tags"].mode().values[0]
 
-    # preferred_tags = user['preferred_tags']
-    # preferred_tags = df_problems["tags"].mode().values[0]
-    # average_difficulty = user['average_difficulty_level']
-    # performance_trends = user['performance_trends']
-    # learning_style = user['learning_style']
+    print(f"Average difficulty: {average_difficulty}")
+    print(f"Performance trends: {performance_trends}")
+    print(f"Learning style: {learning_style}")
+    print(f"Preferred tags: {preferred_tags}")
 
     # Convert categorical to numerical
     label_encoder = LabelEncoder()
@@ -156,7 +291,6 @@ def extract_features(user):
 
     # Encode preferred tags
     ohe = OneHotEncoder()
-    # Reached here.
     tags_encoded = ohe.fit_transform([preferred_tags]).toarray()[0]
 
     # Aggregate other features if needed
