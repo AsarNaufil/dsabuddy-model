@@ -28,29 +28,18 @@ problems_df = pd.DataFrame(problems_data)
 # Feature Engineering
 
 
-# TODO: Change me to mode
-def calculate_avg_difficulty(df):
-
-    # print(df.columns)
-
-    for problem in df:
-        difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
-        problem["difficulty_score"] = difficulty_values[problem["difficulty"]]
-        # print(problem["difficulty_score"])
-
-    print((df))
-    # print(type(df["difficulty_score"]))
-    # print(df["difficulty_score"])
-    print(df["difficulty_score"].mean())
-
-    # return df["difficulty_score"].mean()
+def calculate_mode_difficulty(df):
+    # return the difficulty score with the highest frequency
+    difficulty_values = {"easy": 1, "medium": 2, "hard": 3}
+    df["difficulty_score"] = df["difficulty"].map(difficulty_values)
+    return df["difficulty"].mode().values[0]
 
 
 def predict_performance_trend(df):
     if df.empty:
         return "Insufficient data"
 
-    average_time = df["time_taken_minutes"].mean()
+    average_time = df["time_taken"].mean()
     if average_time < 15:
         return "Improving very quickly"
     elif average_time < 30:
@@ -147,11 +136,12 @@ def extract_features(user):
     # print(f"User: {user['solved_problems'][0][0]}")
     # Convert solved problems to a DataFrame
     df_problems = convert_to_dataframe(user)
-    average_difficulty = calculate_avg_difficulty(df_problems)
+    average_difficulty = calculate_mode_difficulty(df_problems)
     performance_trends = predict_performance_trend(df_problems)
     learning_style = assess_learning_style(df_problems)
-    # print(df_problems)
+
     # preferred_tags = user['preferred_tags']
+    # preferred_tags = df_problems["tags"].mode().values[0]
     # average_difficulty = user['average_difficulty_level']
     # performance_trends = user['performance_trends']
     # learning_style = user['learning_style']
@@ -166,6 +156,7 @@ def extract_features(user):
 
     # Encode preferred tags
     ohe = OneHotEncoder()
+    # Reached here.
     tags_encoded = ohe.fit_transform([preferred_tags]).toarray()[0]
 
     # Aggregate other features if needed
