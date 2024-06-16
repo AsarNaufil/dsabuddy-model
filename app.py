@@ -9,22 +9,9 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from connector import MongoDBConnector as con
 import json as JSON
+import random
 
 # Fetch user data
-
-# connector = con()
-
-
-# user_id = "u123456"
-# users_data = connector.get_training_user_data(user_id)
-# problems_data = connector.get_problem_data()
-
-# print(f"Users data: {users_data["solved_problems"][0][0].keys()}")
-# print(f"Problems data: {problems_data}")
-
-# Data Preprocessing
-# users_df = pd.DataFrame(users_data)
-# problems_df = pd.DataFrame(problems_data)
 
 # Feature Engineering
 
@@ -96,6 +83,9 @@ def convert_to_dataframe(user_data):
         problem["time_taken"] = int(time_taken.split()[0])
 
         # sanitize solved_at
+        if not problem["solved_at"]:
+            return pd.DataFrame()
+            print(f"problem: {problem}")
         solved_at = problem["solved_at"]
         problem["solved_at"] = pd.to_datetime(solved_at)
 
@@ -359,6 +349,7 @@ def suggest_next_problem():
         return jsonify({"error": "user_id is required"})
 
     users_data = connector.get_training_user_data(user_id)
+    # print(users_data)
     problems_data = connector.get_problem_data()
 
     users_df = pd.DataFrame(users_data)
@@ -367,19 +358,35 @@ def suggest_next_problem():
     next_difficulty = suggest_next_difficulty(users_df)
     next_tags = suggest_next_tags(users_df)
 
+    # print(f"Next difficulty: {next_difficulty}")
+    # print(f"Next tags: {next_tags}")
+
+    # make a query such that tag and tags both are used whenever one is available
     query = {
         "difficulty": next_difficulty,
-        "tags": {"$in": next_tags}
+        "$or": [
+            {"tags": {"$in": next_tags}},
+            {"tag": {"$in": next_tags}}
+        ]
+
     }
 
-    result = list(connector.search_problems(query))[0]
-    print(type(result))
-    print((result))
+    result = list(connector.search_problems(query))
+    # print(f"Result: {result}")
+    # Try to suggest a problem with any one of the tags
+    if not result or len(result) == 0:
+        return jsonify({"error": "No problems found"})
+    result = random.choice(result)
+
+    # result = list(connector.search_problems(query))
+    # print(list(connector.search_problems(query)))
+    # print(type(result))
+    # print((result))
 
     result['_id'] = str(result['_id'])
 
     # result = JSON.dumps(result)
-    print(type(result))
+    # print(type(result))
 
     # response = {
     #     "next_difficulty": next_difficulty,
@@ -395,4 +402,4 @@ def suggest_next_problem():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8000)

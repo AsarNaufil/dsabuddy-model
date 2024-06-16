@@ -9,7 +9,8 @@ class MongoDBConnector:
         load_dotenv()
         self.mongo_username = os.getenv("MONGODB_ATLAS_USERNAME")
         self.mongo_password = os.getenv("MONGODB_ATLAS_PASSWORD")
-        self.connection_string = f"mongodb+srv://{self.mongo_username}:{self.mongo_password}@clusterhack.gwtbxxu.mongodb.net/"
+        self.connection_string = f"mongodb+srv://{self.mongo_username}:{
+            self.mongo_password}@clusterhack.gwtbxxu.mongodb.net/"
         self.client = pymongo.MongoClient(self.connection_string)
         self.default_collection = default_collection
 
@@ -29,7 +30,7 @@ class MongoDBConnector:
 
     def get_training_user_data(self, user_id):
         db = self.client["problemdb"]
-        collection = db["userSolvedProb"]
+        collection = db["userSolvedProbs"]
         cursor = collection.find({"user_id": user_id})
         df = pd.DataFrame(list(cursor))
         return df
@@ -43,13 +44,11 @@ class MongoDBConnector:
 
     def search_problems(self, criteria):
         db = self.client["problemdb"]
+        print(criteria)
         collection = db["leetcode"]
         cursor = collection.find(criteria)
         return cursor
         # convert cursor to json
-
-        # convert pd.datetime to ISODate JSON
-        # problem["solved_at"] = pd.to_datetime(solved_at).to_pydatetime()
 
     def search_aggregate(self, pipeline):
         db = self.client["problemdb"]
